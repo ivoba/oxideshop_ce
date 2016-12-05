@@ -33,9 +33,6 @@
     $this->sShopDir     = '<sShopDir>';
     $this->sCompileDir  = '<sCompileDir>';
 
-    // UTF-8 mode in shop 0 - off, 1 - on
-    $this->iUtfMode = '<iUtfMode>';
-
     // Force shop edition. Even if enterprise or professional packages exists, shop edition can still be forced here.
     // Possible options: CE|PE|EE or left empty (will be determined automatically).
     $this->edition = '';
@@ -148,11 +145,6 @@
      * e.g. array("user_class" => false);
      */
     $this->aUserComponentNames = null;
-
-    /**
-     * Default database connection character set. This option is only used when config option iUtfMode is set to 0.
-     */
-    $this->sDefaultDatabaseConnection = 'latin1';
 
     /**
      * Additional multi language tables

@@ -84,25 +84,13 @@ class OutputTest extends \OxidTestCase
     }
 
     /**
-     * Testing output processor replaces euro sign in non utf mode
+     * Testing output processor replaces euro sign in utf mode
      */
     public function testProcessWithEuroSign()
     {
         $oOutput = oxNew('oxOutput');
         $this->getConfig()->setConfigParam('blSkipEuroReplace', false);
-        $this->getConfig()->setConfigParam('iUtfMode', 0);
-        $this->assertEquals('&euro;someting', $oOutput->process('山ometing', 'something'));
-    }
-
-    /**
-     * Testing output processor replaces euro sign in utf mode
-     */
-    public function testProcessWithEuroSignInUtfMode()
-    {
-        $oOutput = oxNew('oxOutput');
-        $this->getConfig()->setConfigParam('blSkipEuroReplace', false);
-        $this->getConfig()->setConfigParam('iUtfMode', 1);
-        $this->assertEquals('山ometing', $oOutput->process('山ometing', 'something'));
+        $this->assertEquals('嚙編ometing', $oOutput->process('嚙編ometing', 'something'));
     }
 
     /**
@@ -112,9 +100,8 @@ class OutputTest extends \OxidTestCase
     {
         $oOutput = oxNew('oxOutput');
         $this->getConfig()->setConfigParam('blSkipEuroReplace', true);
-        $this->getConfig()->setConfigParam('iUtfMode', 0);
 
-        $this->assertEquals('山ometing', $oOutput->process('山ometing', 'something'));
+        $this->assertEquals('嚙編ometing', $oOutput->process('嚙編ometing', 'something'));
     }
 
     public function testAddVersionTags()

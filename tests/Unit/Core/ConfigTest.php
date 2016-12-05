@@ -243,17 +243,10 @@ class ConfigTest extends \OxidTestCase
         return $res;
     }
 
-    public function testIsUtfWhenInUtfMode()
+    public function testIsUtf()
     {
         $oConfig = $this->getMock('oxConfig', array('getConfigParam'));
-        $oConfig->expects($this->any())->method('getConfigParam')->with($this->equalTo('iUtfMode'))->will($this->returnValue(0));
-        $this->assertFalse($oConfig->isUtf());
-    }
-
-    public function testIsUtfWhenInISOMode()
-    {
-        $oConfig = $this->getMock('oxConfig', array('getConfigParam'));
-        $oConfig->expects($this->any())->method('getConfigParam')->with($this->equalTo('iUtfMode'))->will($this->returnValue(1));
+        $oConfig->expects($this->never())->method('getConfigParam');
         $this->assertTrue($oConfig->isUtf());
     }
 
@@ -2197,20 +2190,6 @@ class ConfigTest extends \OxidTestCase
         $oConfig->init();
         $oConfig->setConfigParam('blDemoShop', true);
         $this->assertTrue($oConfig->isDemoShop());
-    }
-
-    public function testUtfModeIsSet()
-    {
-        $oConfig = $this->getMock('oxConfig', array('getConfigParam'));
-        $oConfig->expects($this->once())->method('getConfigParam')->with('iUtfMode')->will($this->returnValue(1));
-        $this->assertTrue($oConfig->isUtf(), 'Should be utf mode.');
-    }
-
-    public function testUtfModeIsNotSet()
-    {
-        $oConfig = $this->getMock('oxConfig', array('getConfigParam'));
-        $oConfig->expects($this->once())->method('getConfigParam')->with('iUtfMode')->will($this->returnValue(0));
-        $this->assertFalse($oConfig->isUtf(), 'Should not be utf mode.');
     }
 
     public function testIsThemeOption()
