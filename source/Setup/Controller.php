@@ -51,7 +51,8 @@ class Controller extends Core
         return $this->_oView;
     }
 
-    // ---- controllers ----
+    // BEGIN: Controllers
+
     /**
      * First page with system requirements check
      *
@@ -524,6 +525,8 @@ class Controller extends Core
 
         return "finish.php";
     }
+
+    // END: Controllers
 
     /**
      * @param string $edition
