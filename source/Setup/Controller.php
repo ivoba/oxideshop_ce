@@ -37,20 +37,6 @@ class Controller extends Core
     /** @var View */
     private $_oView = null;
 
-    /**
-     * Returns View object
-     *
-     * @return View
-     */
-    public function getView()
-    {
-        if ($this->_oView == null) {
-            $this->_oView = new View();
-        }
-
-        return $this->_oView;
-    }
-
     // BEGIN: Controllers
 
     /**
@@ -527,6 +513,20 @@ class Controller extends Core
     }
 
     // END: Controllers
+
+    /**
+     * Returns View object
+     *
+     * @return View
+     */
+    public function getView()
+    {
+        if ($this->_oView == null) {
+            $this->_oView = new View();
+        }
+
+        return $this->_oView;
+    }
 
     /**
      * @param string $edition
