@@ -40,6 +40,14 @@ class Controller extends Core
     // BEGIN: Controllers
 
     /**
+     * Controller constructor
+     */
+    public function __construct()
+    {
+        $this->view = new View();
+    }
+
+    /**
      * First page with system requirements check
      *
      * @return string
@@ -499,10 +507,6 @@ class Controller extends Core
      */
     public function getView()
     {
-        if ($this->view == null) {
-            $this->view = new View();
-        }
-
         return $this->view;
     }
 
