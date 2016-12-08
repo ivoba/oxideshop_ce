@@ -551,4 +551,24 @@ class Utilities extends Core
         return $this->getUtilitiesInstance()->getVendorDir().'/'.EditionRootPathProvider::EDITIONS_DIRECTORY.'/'
         .'oxideshop-demodata-'.strtolower($editionSelector->getEdition()).'/src/demodata.sql';
     }
+
+    /**
+     * Returns the contents of license agreement in requested language.
+     *
+     * @param string $languageId
+     * @return string
+     */
+    public function getLicenseContent($languageId)
+    {
+        $licensePathElements = [
+            $this->getSetupDirectory(),
+            ucfirst($languageId),
+            "lizenz.txt"
+        ];
+        $licensePath = implode(DIRECTORY_SEPARATOR, $licensePathElements);
+
+        $licenseContent = $this->getFileContents($licensePath);
+
+        return $licenseContent;
+    }
 }
