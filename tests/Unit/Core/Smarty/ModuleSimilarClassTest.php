@@ -23,6 +23,7 @@ namespace Unit\Core\Smarty;
 
 use \testModuleSimilarName_parent;
 use \oxRegistry;
+use \oxTestModules;
 
 class ModuleSimilarClassTest extends \OxidTestCase
 {
@@ -54,6 +55,10 @@ class ModuleSimilarClassTest extends \OxidTestCase
      */
     public function testModuleSimilarName_ClassNotExist()
     {
+        $exception = $this->getMock("oxSystemComponentException", ['debugOut']);
+        $exception->expects($this->any())->method('debugOut');
+        oxTestModules::addModuleObject("oxSystemComponentException", $exception);
+
         $filePath = $this->createFile('testModuleSimilarName.php', '<?php
             class testModuleSimilarName extends testModuleSimilarName_parent {
                 public function sayHi() {

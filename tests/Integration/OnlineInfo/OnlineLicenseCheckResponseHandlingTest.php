@@ -21,8 +21,10 @@
  */
 namespace Integration\OnlineInfo;
 
-use oxCurl;
-use oxRegistry;
+use \oxCurl;
+use \oxRegistry;
+use \oxSystemComponentException;
+use \oxTestModules;
 
 /**
  * Class Integration_OnlineInfo_FrontendServersInformationStoringTest
@@ -38,6 +40,10 @@ class OnlineLicenseCheckResponseHandlingTest extends \oxUnitTestCase
 {
     public function testRequestHandlingWithPositiveResponse()
     {
+        $exception = $this->getMock(oxSystemComponentException::class, ['debugOut']);
+        $exception->expects($this->any())->method('debugOut');
+        oxTestModules::addModuleObject('oxException', $exception);
+
         $oConfig = oxRegistry::getConfig();
         $oConfig->setConfigParam('blShopStopped', false);
         $oConfig->setConfigParam('sShopVar', '');
@@ -68,7 +74,11 @@ class OnlineLicenseCheckResponseHandlingTest extends \oxUnitTestCase
 
     public function testRequestHandlingWithNegativeResponse()
     {
-        if (!$this->getTestConfig()->getShopEdition() != 'CE') {
+        $exception = $this->getMock(oxSystemComponentException::class, ['debugOut']);
+        $exception->expects($this->any())->method('debugOut');
+        oxTestModules::addModuleObject('oxException', $exception);
+
+        if ($this->getTestConfig()->getShopEdition() != 'CE') {
             $this->markTestSkipped('This test is for Community edition only.');
         }
 
@@ -101,6 +111,10 @@ class OnlineLicenseCheckResponseHandlingTest extends \oxUnitTestCase
 
     public function testRequestHandlingWithInvalidResponse()
     {
+        $exception = $this->getMock(oxSystemComponentException::class, ['debugOut']);
+        $exception->expects($this->any())->method('debugOut');
+        oxTestModules::addModuleObject('oxException', $exception);
+
         $oConfig = oxRegistry::getConfig();
         $oConfig->setConfigParam('blShopStopped', false);
         $oConfig->setConfigParam('sShopVar', '');
