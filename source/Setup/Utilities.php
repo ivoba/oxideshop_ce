@@ -23,7 +23,12 @@
 namespace OxidEsales\EshopCommunity\Setup;
 
 use Exception;
+
+use OxidEsales\Eshop\Core\ConfigFile;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Edition\EditionRootPathProvider;
 use OxidEsales\Eshop\Core\Edition\EditionPathProvider;
+use OxidEsales\Eshop\Core\Edition\EditionSelector;
 
 /**
  * Setup utilities class
@@ -429,5 +434,121 @@ class Utilities extends Core
     public function isValidEmail($sEmail)
     {
         return preg_match($this->_sEmailTpl, $sEmail) != 0;
+    }
+
+    /**
+     * Calls views regeneration command
+     */
+    public function regenerateViews()
+    {
+        $vendorDir = $this->getVendorDir();
+        exec("{$vendorDir}/bin/oe-eshop-facts oe-eshop-db_views_regenerate");
+    }
+
+    /**
+     * Calls database migration command
+     */
+    public function migrateDatabase()
+    {
+        $vendorDir = $this->getVendorDir();
+
+        exec("{$vendorDir}/bin/oe-eshop-facts oe-eshop-db_migrate");
+    }
+
+    /**
+     * Calls demodata assets install command
+     */
+    public function demodataAssetsInstall()
+    {
+        $vendorDir = $this->getVendorDir();
+
+        exec("{$vendorDir}/bin/oe-eshop-facts oe-eshop-demodata_install");
+    }
+
+    /**
+     * @return string
+     */
+    private function getVendorDir()
+    {
+        /** @var ConfigFile $shopConfig */
+        $shopConfig = Registry::get("oxConfigFile");
+        $vendorDir = $shopConfig->getVar('vendorDirectory');
+
+        return $vendorDir;
+    }
+
+    /**
+     * Check if database is up and running
+     *
+     * @param  Database $database
+     * @return bool
+     */
+    public function checkDbExists($database)
+    {
+        try {
+            $databaseExists = true;
+            $database->execSql("select * from oxconfig");
+        } catch (Exception $exception) {
+            $databaseExists = false;
+        }
+
+        return $databaseExists;
+    }
+
+    /**
+     * Get specific edition sql directory
+     *
+     * @param null|string $edition
+     * @return string
+     */
+    public function getSqlDirectory($edition = null)
+    {
+        $editionPathSelector = $this->getEditionPathProvider($edition);
+        return $editionPathSelector->getDatabaseSqlDirectory();
+    }
+
+    /**
+     * Get setup directory
+     *
+     * @return string
+     */
+    public function getSetupDirectory()
+    {
+        $editionPathSelector = $this->getEditionPathProvider();
+        return $editionPathSelector->getSetupDirectory();
+    }
+
+    /**
+     * @param string $edition
+     * @return EditionPathProvider
+     */
+    private function getEditionPathProvider($edition = null)
+    {
+        $editionPathSelector = new EditionRootPathProvider(new EditionSelector($edition));
+        return new EditionPathProvider($editionPathSelector);
+    }
+
+    /**
+     * Check if setup should import the demodata file created from demodata servers.
+     *
+     * @param int $useDemodata
+     * @return bool
+     */
+    public function checkIfDemodataPrepared($useDemodata)
+    {
+        $demodataSqlFile = $this->getDemodataSqlFilePath();
+        return $useDemodata && file_exists($demodataSqlFile) ? true : false;
+    }
+
+    /**
+     * Method forms path to demodata.sql file according edition.
+     *
+     * @return string
+     */
+    public function getDemodataSqlFilePath()
+    {
+        $editionSelector = new EditionSelector();
+        return $this->getUtilitiesInstance()->getVendorDir().'/'.EditionRootPathProvider::EDITIONS_DIRECTORY.'/'
+        .'oxideshop-demodata-'.strtolower($editionSelector->getEdition()).'/src/demodata.sql';
     }
 }

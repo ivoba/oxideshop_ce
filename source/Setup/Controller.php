@@ -139,14 +139,12 @@ class Controller extends Core
     {
         $licenseFile = "lizenz.txt";
 
-        $editionPathSelector = $this->getEditionPathProvider();
-
         $view = $this->getView();
         $view->setTitle('STEP_2_TITLE');
         $view->setViewParam(
             "aLicenseText",
             $this->getUtilitiesInstance()->getFileContents(
-                $editionPathSelector->getSetupDirectory()
+                $this->getUtilitiesInstance()->getSetupDirectory()
                 . '/'. ucfirst($this->getLanguageInstance()->getLanguage())
                 . '/' . $licenseFile
             )
@@ -328,7 +326,7 @@ class Controller extends Core
         $database->setMySqlCollation($utfMode);
 
         try {
-            $baseSqlDir = $this->getSqlDirectory(EditionSelector::COMMUNITY);
+            $baseSqlDir = $this->getUtilitiesInstance()->getSqlDirectory(EditionSelector::COMMUNITY);
             $database->queryFile("$baseSqlDir/database_schema.sql");
 
             // install demo/initial data
@@ -341,14 +339,14 @@ class Controller extends Core
                 return "default.php";
             }
 
-            $this->regenerateViews();
+            $this->getUtilitiesInstance()->regenerateViews();
         } catch (Exception $exception) {
             $view->setMessage($exception->getMessage());
 
             return "default.php";
         }
 
-        $editionSqlDir = $this->getSqlDirectory();
+        $editionSqlDir = $this->getUtilitiesInstance()->getSqlDirectory();
 
         //update dyn pages / shop country config options (from first step)
         $database->saveShopSettings(array());
@@ -511,16 +509,6 @@ class Controller extends Core
     }
 
     /**
-     * @param string $edition
-     * @return EditionPathProvider
-     */
-    protected function getEditionPathProvider($edition = null)
-    {
-        $editionPathSelector = new EditionRootPathProvider(new EditionSelector($edition));
-        return new EditionPathProvider($editionPathSelector);
-    }
-
-    /**
      * @param Setup $setup
      */
     protected function onDirsWriteSetStep($setup)
@@ -540,7 +528,7 @@ class Controller extends Core
         $canBeOverwritten = true;
 
         if (!$this->userDecidedOverwriteDB()) {
-            $canBeOverwritten = !$this->checkDbExists($database);
+            $canBeOverwritten = !$this->getUtilitiesInstance()->checkDbExists($database);
         }
 
         return $canBeOverwritten;
@@ -583,24 +571,6 @@ class Controller extends Core
     }
 
     /**
-     * Check if database is up and running
-     *
-     * @param  Database $database
-     * @return bool
-     */
-    private function checkDbExists($database)
-    {
-        try {
-            $databaseExists = true;
-            $database->execSql("select * from oxconfig");
-        } catch (Exception $exception) {
-            $databaseExists = false;
-        }
-
-        return $databaseExists;
-    }
-
-    /**
      * Installs demodata or initial, dependent on parameter
      *
      * @param Database $database
@@ -608,83 +578,25 @@ class Controller extends Core
      */
     private function installShopData($database, $demodata = 0)
     {
-        $editionSqlDir = $this->getSqlDirectory();
-        $baseSqlDir = $this->getSqlDirectory(EditionSelector::COMMUNITY);
-        $vendorDir = $this->getVendorDir();
+        $editionSqlDir = $this->getUtilitiesInstance()->getSqlDirectory();
+        $baseSqlDir = $this->getUtilitiesInstance()->getSqlDirectory(EditionSelector::COMMUNITY);
 
         // If demodata files are provided.
-        if ($this->checkIfDemodataPrepared($demodata)) {
-            exec("{$vendorDir}/bin/oe-eshop-facts oe-eshop-db_migrate");
+        if ($this->getUtilitiesInstance()->checkIfDemodataPrepared($demodata)) {
+            $this->getUtilitiesInstance()->migrateDatabase();
 
             // Install demo data.
-            $database->queryFile($this->getDemodataSqlFilePath());
+            $database->queryFile($this->getUtilitiesInstance()->getDemodataSqlFilePath());
             // Copy demodata files.
-            exec("{$vendorDir}/bin/oe-eshop-facts oe-eshop-demodata_install");
+            $this->getUtilitiesInstance()->demodataAssetsInstall();
         } else {
             $database->queryFile("$baseSqlDir/initial_data.sql");
 
-            exec("{$vendorDir}/bin/oe-eshop-facts oe-eshop-db_migrate");
+            $this->getUtilitiesInstance()->migrateDatabase();
 
             if ($demodata) {
                 $database->queryFile("$editionSqlDir/demodata.sql");
             }
         }
-    }
-
-    /**
-     * Check if setup should import the demodata file created from demodata servers.
-     *
-     * @param int $useDemodata
-     * @return bool
-     */
-    private function checkIfDemodataPrepared($useDemodata)
-    {
-        $demodataSqlFile = $this->getDemodataSqlFilePath();
-        return $useDemodata && file_exists($demodataSqlFile) ? true : false;
-    }
-
-    /**
-     * Method forms path to demodata.sql file according edition.
-     *
-     * @return string
-     */
-    private function getDemodataSqlFilePath()
-    {
-        $editionSelector = new EditionSelector();
-        return $this->getVendorDir().'/'.EditionRootPathProvider::EDITIONS_DIRECTORY.'/'
-            .'oxideshop-demodata-'.strtolower($editionSelector->getEdition()).'/src/demodata.sql';
-    }
-
-    /**
-     * @return string
-     */
-    private function getVendorDir()
-    {
-        /** @var ConfigFile $shopConfig */
-        $shopConfig = Registry::get("oxConfigFile");
-        $vendorDir = $shopConfig->getVar('vendorDirectory');
-
-        return $vendorDir;
-    }
-
-    /**
-     * Calls views regeneration command
-     */
-    private function regenerateViews()
-    {
-        $vendorDir = $this->getVendorDir();
-        exec("{$vendorDir}/bin/oe-eshop-facts oe-eshop-db_views_regenerate");
-    }
-
-    /**
-     * Get specific edition sql directory
-     *
-     * @param null|string $edition
-     * @return string
-     */
-    private function getSqlDirectory($edition = null)
-    {
-        $editionPathSelector = $this->getEditionPathProvider($edition);
-        return $editionPathSelector->getDatabaseSqlDirectory();
     }
 }
