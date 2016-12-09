@@ -89,7 +89,6 @@ class OutputTest extends \OxidTestCase
     public function testProcessWithEuroSign()
     {
         $oOutput = oxNew('oxOutput');
-        $this->getConfig()->setConfigParam('blSkipEuroReplace', false);
         $this->assertEquals('�someting', $oOutput->process('�someting', 'something'));
     }
 
@@ -99,7 +98,6 @@ class OutputTest extends \OxidTestCase
     public function testProcessWithEuroSignWithDisabledReplace()
     {
         $oOutput = oxNew('oxOutput');
-        $this->getConfig()->setConfigParam('blSkipEuroReplace', true);
 
         $this->assertEquals('�someting', $oOutput->process('�someting', 'something'));
     }

@@ -85,10 +85,6 @@
     // check setcookie() documentation for more details @php.net
     $this->aCookiePaths = null;
 
-    // uncomment the following line if you want to leave euro sign unchanged in output
-    // by default is set to convert euro sign symbol to html entity
-    // $this->blSkipEuroReplace = true;
-
     // List of all Search-Engine Robots
     $this->aRobots = array(
                         'googlebot',
