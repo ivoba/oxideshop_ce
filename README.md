@@ -36,7 +36,7 @@ You can easily enable code completion in your IDE by installing [this script](ht
 * Project home page - http://oxidforge.org
 * Vendor home page - http://www.oxid-esales.com
 * Bug tracker - https://bugs.oxid-esales.com
-* VM  and SDK - https://github.com/OXID-eSales/oxvm_eshop
+* VM and SDK - https://github.com/OXID-eSales/oxvm_eshop
 
 
 ### Contact us
