@@ -243,10 +243,17 @@ class ConfigTest extends \OxidTestCase
         return $res;
     }
 
-    public function testIsUtf()
+    public function testIsUtfWhenInUtfMode()
     {
         $oConfig = $this->getMock('oxConfig', array('getConfigParam'));
-        $oConfig->expects($this->never())->method('getConfigParam');
+        $oConfig->expects($this->any())->method('getConfigParam')->with($this->equalTo('iUtfMode'))->will($this->returnValue(0));
+        $this->assertFalse($oConfig->isUtf());
+    }
+
+    public function testIsUtfWhenInISOMode()
+    {
+        $oConfig = $this->getMock('oxConfig', array('getConfigParam'));
+        $oConfig->expects($this->any())->method('getConfigParam')->with($this->equalTo('iUtfMode'))->will($this->returnValue(1));
         $this->assertTrue($oConfig->isUtf());
     }
 
